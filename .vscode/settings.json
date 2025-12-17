@@ -47,5 +47,9 @@
     "scss",
     "pcss",
     "postcss"
-  ]
+  ],
+
+  
+  "git.branchProtection": ["main"],
+  "git.branchProtectionPrompt": "alwaysCommitToNewBranch"
 }
