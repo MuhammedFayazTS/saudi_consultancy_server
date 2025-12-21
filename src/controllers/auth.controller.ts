@@ -11,7 +11,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   const exists = await User.findOne({ email });
   if (exists) {
-    res.status(400).json({ message: "User already exists" });
+    res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "User already exists" });
     return;
   }
 
@@ -23,19 +23,14 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     role,
   });
 
-  const token = generateToken({
-    id: user._id,
-    role: user.role,
-  });
-
-  res.status(HTTPSTATUS.CREATED).json({ token });
+  res.status(HTTPSTATUS.CREATED).json({ message: "User registered successfully", user });
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user || !(await user.matchPassword(password))) {
-    res.status(401).json({ message: "Invalid credentials" });
+    res.status(HTTPSTATUS.UNAUTHORIZED).json({ message: "Invalid credentials" });
     return;
   }
   const token = generateToken({
@@ -44,4 +39,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   });
 
   res.status(HTTPSTATUS.OK).json({ token });
+});
+
+export const loggedInUser = asyncHandler(async (req: Request, res: Response) => {
+  res.status(HTTPSTATUS.OK).json({ user: req.user });
 });

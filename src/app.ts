@@ -7,12 +7,26 @@ import type MessageResponse from "./interfaces/message-response.js";
 
 import api from "./api/index.js";
 import * as middlewares from "./middlewares/middlewares.js";
+import { env } from "./utils/env.js";
 
 const app = express();
 
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(cors());
+const allowedOrigins = env.ALLOWED_ORIGINS.split(",").map((origin) => origin.trim());
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get<object, MessageResponse>("/", (req, res) => {
