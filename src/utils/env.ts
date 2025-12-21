@@ -6,6 +6,7 @@ const envSchema = z.object({
   MONGO_URI: z.string().min(1),
   JWT_SECRET: z.string().min(1),
   JWT_EXPIRES_IN: z.string().default("14d"),
+  ALLOWED_ORIGINS: z.string().min(1),
 });
 
 try {

@@ -40,7 +40,7 @@ export const authGuard = asyncHandler(async (req: Request, res: Response, next: 
     }
 
     // attach user to request
-    (req as any).user = user;
+    req.user = user;
     next();
   } catch (error: unknown) {
     res.status(HTTPSTATUS.UNAUTHORIZED).json({ message: "Invalid or expired token", error });
