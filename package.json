@@ -20,9 +20,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.2",
     "morgan": "^1.10.1",
     "zod": "^4.1.12"
   },
@@ -30,6 +34,7 @@
     "@antfu/eslint-config": "^6.2.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.9.2",
     "@types/supertest": "^6.0.3",
