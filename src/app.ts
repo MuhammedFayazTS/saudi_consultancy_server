@@ -6,7 +6,7 @@ import morgan from "morgan";
 import type MessageResponse from "./interfaces/message-response.js";
 
 import api from "./api/index.js";
-import * as middlewares from "./middlewares.js";
+import * as middlewares from "./middlewares/middlewares.js";
 
 const app = express();
 

@@ -1,5 +1,8 @@
 import app from "./app.js";
-import { env } from "./env.js";
+import { connectDB } from "./config/db.js";
+import { env } from "./utils/env.js";
+
+connectDB();
 
 const port = env.PORT;
 const server = app.listen(port, () => {
