@@ -5,6 +5,7 @@ import type MessageResponse from "../interfaces/message-response.js";
 import { authGuard } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
+import customerRoutes from "./customer.routes";
 
 const router = express.Router();
 
@@ -29,5 +30,6 @@ router.get("/test-auth", authGuard, allowRoles("admin"), (req, res) => {
 
 // app routes
 router.use("/auth", authRoutes);
+router.use("/customer", customerRoutes);
 
 export default router;
