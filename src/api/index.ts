@@ -7,6 +7,7 @@ import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
 import userRoutes from "./user.routes";
+import ticketRoutes from "./ticket.routes";
 
 const router = express.Router();
 
@@ -33,5 +34,6 @@ router.get("/test-auth", authGuard, allowRoles("admin"), (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/customer", customerRoutes);
 router.use("/users", userRoutes);
+router.use("/tickets", ticketRoutes);
 
 export default router;
