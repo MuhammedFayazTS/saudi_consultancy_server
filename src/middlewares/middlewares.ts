@@ -20,10 +20,9 @@ export function errorHandler(
   res: Response<ErrorResponse>,
   _next: NextFunction
 ) {
-
   if (err instanceof SyntaxError) {
     return res.status(HTTPSTATUS.BAD_REQUEST).json({
-      message: 'Invalid JSON format, please check your request body',
+      message: "Invalid JSON format, please check your request body",
     });
   }
 

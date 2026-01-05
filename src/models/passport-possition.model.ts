@@ -3,79 +3,82 @@ import type { ObjectId } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
 export interface IPassportPossition extends Document {
-    transactionId: ObjectId;
-    agency: string;
-    agencyDeliveryMethod: string;
-    agencyDeliveryDate: Date;
-    workAgreementStatus: string;
-    workAgreementDate: Date;
-    stampingStatus: string;
-    stampingDate: Date;
-    stampingRemarks: string;
-    receivedInOfficeDate: Date;
-    receivedInOfficeDeliveryMethod: string;
-    receivedToClientDate: Date;
-    receivedToClientDeliveryMethod: string;
-    remarks: string;
+  transactionId: ObjectId;
+  agency: string;
+  agencyDeliveryMethod: string;
+  agencyDeliveryDate: Date;
+  workAgreementStatus: string;
+  workAgreementDate: Date;
+  stampingStatus: string;
+  stampingDate: Date;
+  stampingRemarks: string;
+  receivedInOfficeDate: Date;
+  receivedInOfficeDeliveryMethod: string;
+  receivedToClientDate: Date;
+  receivedToClientDeliveryMethod: string;
+  remarks: string;
 }
 
 const PassportPossitionSchema = new Schema<IPassportPossition>(
-    {
-        transactionId: {
-            type: Schema.Types.ObjectId,
-            ref: "Transaction",
-            required: true
-        },
-        agency: {
-            type: String,
-            trim: true,
-        },
-        agencyDeliveryMethod: {
-            type: String,
-            trim: true,
-        },
-        agencyDeliveryDate: {
-            type: Date,
-        },
-        workAgreementStatus: {
-            type: String,
-            trim: true,
-        },
-        workAgreementDate: {
-            type: Date,
-        },
-
-        stampingStatus: {
-            type: String,
-            trim: true,
-        },
-        stampingDate: {
-            type: Date,
-        },
-        stampingRemarks: {
-            type: String,
-            trim: true,
-        },
-
-        receivedInOfficeDate: {
-            type: Date,
-        },
-        receivedInOfficeDeliveryMethod: {
-            type: String,
-            trim: true,
-        },
-
-        receivedToClientDate: {
-            type: Date,
-        },
-        receivedToClientDeliveryMethod: {
-            type: String,
-            trim: true,
-        },
+  {
+    transactionId: {
+      type: Schema.Types.ObjectId,
+      ref: "Transaction",
+      required: true,
     },
-    {
-        timestamps: true,
-    }
+    agency: {
+      type: String,
+      trim: true,
+    },
+    agencyDeliveryMethod: {
+      type: String,
+      trim: true,
+    },
+    agencyDeliveryDate: {
+      type: Date,
+    },
+    workAgreementStatus: {
+      type: String,
+      trim: true,
+    },
+    workAgreementDate: {
+      type: Date,
+    },
+
+    stampingStatus: {
+      type: String,
+      trim: true,
+    },
+    stampingDate: {
+      type: Date,
+    },
+    stampingRemarks: {
+      type: String,
+      trim: true,
+    },
+
+    receivedInOfficeDate: {
+      type: Date,
+    },
+    receivedInOfficeDeliveryMethod: {
+      type: String,
+      trim: true,
+    },
+
+    receivedToClientDate: {
+      type: Date,
+    },
+    receivedToClientDeliveryMethod: {
+      type: String,
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
-export const PassportPossition = mongoose.model<IPassportPossition>('PassportPossition', PassportPossitionSchema);
+export const PassportPossition = mongoose.model<IPassportPossition>(
+  "PassportPossition",
+  PassportPossitionSchema
+);

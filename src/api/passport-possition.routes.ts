@@ -1,6 +1,11 @@
 import express from "express";
 
-import { createPassportPossition, deletePassportPossition, listPassportPossitions, updatePassportPossition } from "../controllers/passport-possition.controller";
+import {
+  createPassportPossition,
+  deletePassportPossition,
+  listPassportPossitions,
+  updatePassportPossition,
+} from "../controllers/passport-possition.controller";
 
 const router = express.Router();
 
