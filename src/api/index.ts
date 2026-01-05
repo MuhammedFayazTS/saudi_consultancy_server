@@ -6,8 +6,9 @@ import { authGuard } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
-import userRoutes from "./user.routes";
+import passportPossitionRoutes from "./passport-possition.routes.js";
 import ticketRoutes from "./ticket.routes";
+import userRoutes from "./user.routes";
 
 const router = express.Router();
 
@@ -35,5 +36,6 @@ router.use("/auth", authRoutes);
 router.use("/customer", customerRoutes);
 router.use("/users", userRoutes);
 router.use("/tickets", ticketRoutes);
+router.use("/passport-possition", passportPossitionRoutes);
 
 export default router;
