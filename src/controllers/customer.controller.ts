@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
-import { Customer } from "../models/customer.model";
-import { HTTPSTATUS } from "../constants/httpstatus";
+
 import asyncHandler from "express-async-handler";
-import { notDeleted, softDelete } from "../utils/dbQueries";
+
+import { HTTPSTATUS } from "../constants/httpstatus.js";
+import { Customer } from "../models/customer.model";
+import { notDeleted, softDelete } from "../utils/db-queries.js";
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const { name } = req.body;
@@ -29,8 +31,8 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   } = req.query as Record<string, any>;
 
   // pagination
-  const pageNum = Math.max(1, parseInt(String(page), 10) || 1);
-  const limitNum = Math.min(100, Math.max(1, parseInt(String(limit), 10) || 10));
+  const pageNum = Math.max(1, Number.parseInt(String(page), 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, Number.parseInt(String(limit), 10) || 10));
 
   // base query (soft delete safe)
   const query: any = {
@@ -38,8 +40,10 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   };
 
   // filters
-  if (rest.state) query.state = rest.state;
-  if (rest.district) query.district = rest.district;
+  if (rest.state) 
+query.state = rest.state;
+  if (rest.district) 
+query.district = rest.district;
 
   // search (name, passport, contact)
   if (search) {
@@ -77,7 +81,8 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) projection = selected.join(" ");
+    if (selected.length) 
+projection = selected.join(" ");
   }
 
   // sorting

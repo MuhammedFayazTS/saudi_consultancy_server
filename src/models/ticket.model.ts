@@ -1,4 +1,5 @@
 import type { Document, Types } from "mongoose";
+
 import mongoose, { Schema } from "mongoose";
 
 export interface ITicket extends Document {
@@ -8,7 +9,7 @@ export interface ITicket extends Document {
   travellingDate: Date;
   airlineCompany: string;
   paymentMode: string;
-  isDeleted: Boolean;
+  isDeleted: boolean;
 }
 
 const TicketSchema = new Schema<ITicket>(
