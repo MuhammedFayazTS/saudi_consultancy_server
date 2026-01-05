@@ -40,10 +40,8 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   };
 
   // filters
-  if (rest.state) 
-query.state = rest.state;
-  if (rest.district) 
-query.district = rest.district;
+  if (rest.state) query.state = rest.state;
+  if (rest.district) query.district = rest.district;
 
   // search (name, passport, contact)
   if (search) {
@@ -81,8 +79,7 @@ query.district = rest.district;
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) 
-projection = selected.join(" ");
+    if (selected.length) projection = selected.join(" ");
   }
 
   // sorting
