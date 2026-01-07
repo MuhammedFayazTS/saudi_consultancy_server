@@ -8,6 +8,7 @@ import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
 import passportPossitionRoutes from "./passport-possition.routes.js";
 import ticketRoutes from "./ticket.routes";
+import transactionRoutes from "./transaction.routes.js";
 import userRoutes from "./user.routes";
 
 const router = express.Router();
@@ -37,5 +38,6 @@ router.use("/customer", customerRoutes);
 router.use("/users", userRoutes);
 router.use("/tickets", ticketRoutes);
 router.use("/passport-possition", passportPossitionRoutes);
+router.use("/transaction", transactionRoutes);
 
 export default router;

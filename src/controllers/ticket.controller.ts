@@ -5,7 +5,6 @@ import asyncHandler from "express-async-handler";
 import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { Ticket } from "../models/ticket.model";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
-import { createTransaction } from "./transaction.controller";
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = req.body;
