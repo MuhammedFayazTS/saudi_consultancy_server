@@ -48,7 +48,10 @@ export const updatePassportPossition = asyncHandler(async (req: Request, res: Re
 });
 
 export const listPassportPossitions = asyncHandler(async (req: Request, res: Response) => {
-  const { transactionId } = req.query;
+  const { transactionId, search, sortBy, sortOrder, page, limit } = req.query;
+
+  const pageNum = Math.max(1, Number.parseInt(String(page), 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, Number.parseInt(String(limit), 10) || 10));
 
   const filter: Record<string, any> = {};
 
@@ -56,11 +59,29 @@ export const listPassportPossitions = asyncHandler(async (req: Request, res: Res
     filter.transactionId = transactionId;
   }
 
-  const passportPossitions = await PassportPossition.find(filter).sort({ createdAt: -1 });
+  if (search) {
+    const s = String(search).trim();
+    const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(esc, "i");
+    filter.$or = [{ agency: regex }];
+  }
+
+  const sort: Record<string, 1 | -1> = {};
+  sort[String(sortBy)] = String(sortOrder).toLowerCase() === "asc" ? 1 : -1;
+
+  const total = await PassportPossition.countDocuments(filter);
+  const pages = Math.max(1, Math.ceil(total / limitNum));
+
+  const passportPossitions = await PassportPossition.find(filter).sort(sort).skip((pageNum - 1) * limitNum).limit(limitNum).lean();
 
   res.status(HTTPSTATUS.OK).json({
-    count: passportPossitions.length,
-    passportPossitions,
+    data: passportPossitions,
+    meta: {
+      total,
+      page: pageNum,
+      pages,
+      limit: limitNum,
+    },
   });
 });
 
