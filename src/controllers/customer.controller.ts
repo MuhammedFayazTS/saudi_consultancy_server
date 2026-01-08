@@ -4,10 +4,12 @@ import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { Customer } from "../models/customer.model";
-import { notDeleted, softDelete } from "../utils/db-queries.js";
+import { notDeleted, } from "../utils/db-queries.js";
+import { customerZodSchema } from "../utils/validators/customer.schema.js";
 
-export const create = asyncHandler(async (req: Request, res: Response) => {
-  const { name } = req.body;
+export const createCustomer = asyncHandler(async (req: Request, res: Response) => {
+  const payload = customerZodSchema.parse(req.body);
+  const { name } = payload;
 
   const exists = await Customer.findOne({ name });
   if (exists) {
@@ -20,7 +22,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   res.status(HTTPSTATUS.CREATED).json({ message: "Customer registered successfully", customer });
 });
 
-export const list = asyncHandler(async (req: Request, res: Response) => {
+export const listCustomers = asyncHandler(async (req: Request, res: Response) => {
   const {
     page = "1",
     limit = "10",
@@ -40,8 +42,10 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   };
 
   // filters
-  if (rest.state) query.state = rest.state;
-  if (rest.district) query.district = rest.district;
+  if (rest.state) 
+    query.state = rest.state;
+  if (rest.district) 
+    query.district = rest.district;
 
   // search (name, passport, contact)
   if (search) {
@@ -79,7 +83,8 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) projection = selected.join(" ");
+    if (selected.length) 
+      projection = selected.join(" ");
   }
 
   // sorting
@@ -89,7 +94,7 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   // counts
   const total = await Customer.countDocuments(query);
   const pages = Math.max(1, Math.ceil(total / limitNum));
-  console.log("query", query);
+
   // fetch
   const customers = await Customer.find(query)
     .sort(sort)
@@ -109,7 +114,7 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const getOne = asyncHandler(async (req: Request, res: Response) => {
+export const getOneCustomer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const customer = await Customer.findById(id);
@@ -124,10 +129,11 @@ export const getOne = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const update = asyncHandler(async (req: Request, res: Response) => {
+export const updateCustomer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const inputParams = customerZodSchema.partial().parse(req.body);
 
-  const customer = await Customer.findByIdAndUpdate(id, req.body, {
+  const customer = await Customer.findByIdAndUpdate(id, inputParams, {
     new: true, // return updated document
     runValidators: true,
   });
@@ -143,7 +149,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const listForSelect = asyncHandler(async (req: Request, res: Response) => {
+export const listForSelectCustomers = asyncHandler(async (req: Request, res: Response) => {
   const customers = await Customer.find(notDeleted, { _id: 1, name: 1 }).sort({ id: 1 });
 
   const options = customers.map((customer) => ({
@@ -157,14 +163,18 @@ export const listForSelect = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
-export const destroy = asyncHandler(async (req: Request, res: Response) => {
+export const deleteCustomer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const customer = await Customer.findByIdAndDelete(id, softDelete);
+  const customer = await Customer.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
 
   if (!customer) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Customer not found" });
-    return;
+    return
   }
 
   res.status(HTTPSTATUS.OK).json({

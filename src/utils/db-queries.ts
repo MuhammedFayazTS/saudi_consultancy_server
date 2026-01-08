@@ -1,3 +1,3 @@
-export const notDeleted = { deletedAt: null };
+export const notDeleted = { isDeleted: false };
 
-export const softDelete = { deletedAt: true };
+export const softDelete = { isDeleted: true };
