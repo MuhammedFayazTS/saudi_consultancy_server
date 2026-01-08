@@ -6,7 +6,7 @@ import { authGuard } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
-import passportPossitionRoutes from "./passport-possition.routes.js";
+import passportPossessionRoutes from "./passport-possession.routes.js";
 import ticketRoutes from "./ticket.routes";
 import transactionRoutes from "./transaction.routes.js";
 import userRoutes from "./user.routes";
@@ -37,7 +37,7 @@ router.use("/auth", authRoutes);
 router.use("/customer", customerRoutes);
 router.use("/users", userRoutes);
 router.use("/tickets", ticketRoutes);
-router.use("/passport-possition", passportPossitionRoutes);
+router.use("/passport-possession", passportPossessionRoutes);
 router.use("/transaction", transactionRoutes);
 
 export default router;

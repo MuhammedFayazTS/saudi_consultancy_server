@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { objectIdSchema } from "../zod.helper";
 
-export const PassportPossitionZodSchema = z.object({
+export const PassportPossessionZodSchema = z.object({
   transactionId: objectIdSchema,
 
   agency: z.string().trim().optional(),
