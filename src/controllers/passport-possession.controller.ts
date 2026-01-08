@@ -10,17 +10,17 @@ import { PassportPossessionZodSchema } from "../utils/validators/passport-posses
 export const createPassportPossession = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = PassportPossessionZodSchema.parse(req.body);
 
-  const { transactionId, ...rest } = inputParams;
-  const parsedTransactionId = transactionId as unknown as ObjectId;
+  const { customerId, ...rest } = inputParams;
+  const parsedCustomerId = customerId as unknown as ObjectId;
 
   const passportPossession = await PassportPossession.create({
     ...rest,
-    transactionId: parsedTransactionId,
+    customerId: parsedCustomerId,
   });
 
   res
     .status(HTTPSTATUS.CREATED)
-    .json({ message: "Passport Possition registered successfully", passportPossession });
+    .json({ message: "Passport Possession registered successfully", passportPossession });
 });
 
 export const updatePassportPossession = asyncHandler(async (req: Request, res: Response) => {
@@ -28,7 +28,7 @@ export const updatePassportPossession = asyncHandler(async (req: Request, res: R
 
   const inputParams = PassportPossessionZodSchema.partial().parse(req.body);
 
-  delete (inputParams as any).transactionId;
+  delete (inputParams as any).customerId;
 
   const passportPossession = await PassportPossession.findByIdAndUpdate(
     id,
@@ -37,26 +37,26 @@ export const updatePassportPossession = asyncHandler(async (req: Request, res: R
   );
 
   if (!passportPossession) {
-    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possition not found" });
+    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
     return;
   }
 
   res.status(HTTPSTATUS.OK).json({
-    message: "Passport Possition updated successfully",
+    message: "Passport Possession updated successfully",
     passportPossession,
   });
 });
 
 export const listPassportPossessions = asyncHandler(async (req: Request, res: Response) => {
-  const { transactionId, search, sortBy, sortOrder, page, limit } = req.query;
+  const { customerId, search, sortBy, sortOrder, page, limit } = req.query;
 
   const pageNum = Math.max(1, Number.parseInt(String(page), 10) || 1);
   const limitNum = Math.min(100, Math.max(1, Number.parseInt(String(limit), 10) || 10));
 
   const filter: Record<string, any> = {};
 
-  if (transactionId) {
-    filter.transactionId = transactionId;
+  if (customerId) {
+    filter.customerId = customerId;
   }
 
   if (search) {
@@ -91,11 +91,11 @@ export const deletePassportPossession = asyncHandler(async (req: Request, res: R
   const passportPossession = await PassportPossession.findByIdAndDelete(id);
 
   if (!passportPossession) {
-    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possition not found" });
+    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
     return;
   }
 
   res.status(HTTPSTATUS.OK).json({
-    message: "Passport Possition deleted successfully",
+    message: "Passport Possession deleted successfully",
   });
 });
