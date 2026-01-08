@@ -2,8 +2,8 @@ import type { ObjectId } from "mongoose";
 
 import mongoose, { Schema } from "mongoose";
 
-export interface IPassportPossition extends Document {
-  transactionId: ObjectId;
+export interface IPassportPossession extends Document {
+  customerId: ObjectId;
   agency: string;
   agencyDeliveryMethod: string;
   agencyDeliveryDate: Date;
@@ -17,11 +17,12 @@ export interface IPassportPossition extends Document {
   receivedToClientDate: Date;
   receivedToClientDeliveryMethod: string;
   remarks: string;
+  isDeleted: Boolean;
 }
 
-const PassportPossitionSchema = new Schema<IPassportPossition>(
+const PassportPossessionSchema = new Schema<IPassportPossession>(
   {
-    transactionId: {
+    customerId: {
       type: Schema.Types.ObjectId,
       ref: "Transaction",
       required: true,
@@ -44,7 +45,6 @@ const PassportPossitionSchema = new Schema<IPassportPossition>(
     workAgreementDate: {
       type: Date,
     },
-
     stampingStatus: {
       type: String,
       trim: true,
@@ -72,13 +72,14 @@ const PassportPossitionSchema = new Schema<IPassportPossition>(
       type: String,
       trim: true,
     },
+    isDeleted: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,
   }
 );
 
-export const PassportPossition = mongoose.model<IPassportPossition>(
-  "PassportPossition",
-  PassportPossitionSchema
+export const PassportPossession = mongoose.model<IPassportPossession>(
+  "PassportPossession",
+  PassportPossessionSchema
 );
