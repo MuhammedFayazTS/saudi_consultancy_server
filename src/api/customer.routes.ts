@@ -1,22 +1,23 @@
+
 import express from "express";
 
 import {
-  create,
-  list,
-  getOne,
-  update,
-  listForSelect,
-  destroy,
+  createCustomer,
+  deleteCustomer,
+  getOneCustomer,
+  listCustomers,
+  listForSelectCustomers,
+  updateCustomer,
 } from "../controllers/customer.controller";
 import { authGuard } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/", authGuard, create);
-router.get("/", authGuard, list);
-router.get("/select", authGuard, listForSelect);
-router.get("/customers/:id", authGuard, getOne);
-router.put("/customers/:id", authGuard, update);
-router.delete("/customers/:id", authGuard, destroy);
+router.post("/", authGuard, createCustomer);
+router.get("/", authGuard, listCustomers);
+router.get("/select", authGuard, listForSelectCustomers);
+router.get("/:id", authGuard, getOneCustomer);
+router.put("/:id", authGuard, updateCustomer);
+router.delete("/:id", authGuard, deleteCustomer);
 
 export default router;

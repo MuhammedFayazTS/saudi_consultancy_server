@@ -1,4 +1,5 @@
 import type { Document } from "mongoose";
+
 import mongoose, { Schema } from "mongoose";
 
 export interface ICustomer extends Document {
@@ -8,9 +9,9 @@ export interface ICustomer extends Document {
   postOffice: string;
   state: string;
   district: string;
-  contactNumber1: number;
-  contactNumber2: number;
-  isDeleted: Boolean;
+  contactNumber1: string;
+  contactNumber2: string;
+  isDeleted: boolean;
 }
 
 const CustomerSchema = new Schema<ICustomer>(
@@ -21,8 +22,8 @@ const CustomerSchema = new Schema<ICustomer>(
     postOffice: { type: String, required: true },
     state: { type: String, required: true },
     district: { type: String, required: true },
-    contactNumber1: { type: Number, required: true },
-    contactNumber2: { type: Number },
+    contactNumber1: { type: String, required: true },
+    contactNumber2: { type: String },
     isDeleted: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
