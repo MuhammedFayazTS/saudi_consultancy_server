@@ -74,7 +74,11 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
   const total = await PassportPossession.countDocuments(filter);
   const pages = Math.max(1, Math.ceil(total / limitNum));
 
-  const passportPossessions = await PassportPossession.find(filter).sort(sort).skip((pageNum - 1) * limitNum).limit(limitNum).lean();
+  const passportPossessions = await PassportPossession.find(filter)
+    .sort(sort)
+    .skip((pageNum - 1) * limitNum)
+    .limit(limitNum)
+    .lean();
 
   res.status(HTTPSTATUS.OK).json({
     data: passportPossessions,
