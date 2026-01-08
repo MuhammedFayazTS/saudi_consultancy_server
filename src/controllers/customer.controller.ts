@@ -4,7 +4,7 @@ import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { Customer } from "../models/customer.model";
-import { notDeleted, } from "../utils/db-queries.js";
+import { notDeleted } from "../utils/db-queries.js";
 import { customerZodSchema } from "../utils/validators/customer.schema.js";
 
 export const createCustomer = asyncHandler(async (req: Request, res: Response) => {
@@ -42,10 +42,8 @@ export const listCustomers = asyncHandler(async (req: Request, res: Response) =>
   };
 
   // filters
-  if (rest.state) 
-    query.state = rest.state;
-  if (rest.district) 
-    query.district = rest.district;
+  if (rest.state) query.state = rest.state;
+  if (rest.district) query.district = rest.district;
 
   // search (name, passport, contact)
   if (search) {
@@ -83,8 +81,7 @@ export const listCustomers = asyncHandler(async (req: Request, res: Response) =>
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) 
-      projection = selected.join(" ");
+    if (selected.length) projection = selected.join(" ");
   }
 
   // sorting
@@ -166,15 +163,11 @@ export const listForSelectCustomers = asyncHandler(async (req: Request, res: Res
 export const deleteCustomer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const customer = await Customer.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  );
+  const customer = await Customer.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 
   if (!customer) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Customer not found" });
-    return
+    return;
   }
 
   res.status(HTTPSTATUS.OK).json({
