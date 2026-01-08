@@ -6,6 +6,7 @@ import asyncHandler from "express-async-handler";
 import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { PassportPossession } from "../models/passport-possession.model.js";
 import { PassportPossessionZodSchema } from "../utils/validators/passport-possession.schema.js";
+import { notDeleted, softDelete } from "../utils/db-queries.js";
 
 export const createPassportPossession = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = PassportPossessionZodSchema.parse(req.body);
@@ -25,7 +26,6 @@ export const createPassportPossession = asyncHandler(async (req: Request, res: R
 
 export const updatePassportPossession = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-
   const inputParams = PassportPossessionZodSchema.partial().parse(req.body);
 
   delete (inputParams as any).customerId;
@@ -53,7 +53,9 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
   const pageNum = Math.max(1, Number.parseInt(String(page), 10) || 1);
   const limitNum = Math.min(100, Math.max(1, Number.parseInt(String(limit), 10) || 10));
 
-  const filter: Record<string, any> = {};
+  const filter: Record<string, any> = {
+    ...notDeleted,
+  };
 
   if (customerId) {
     filter.customerId = customerId;
@@ -85,10 +87,28 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
   });
 });
 
+export const getPassportPossessionById = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const passportPossession = await PassportPossession.findById(id);
+
+  console.log(passportPossession);
+
+  if (!passportPossession) {
+    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
+    return;
+  }
+
+  res.status(HTTPSTATUS.OK).json({
+    message: "Passport Possession fetched successfully",
+    data: passportPossession,
+  });
+});
+
 export const deletePassportPossession = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const passportPossession = await PassportPossession.findByIdAndDelete(id);
+  const passportPossession = await PassportPossession.findByIdAndDelete(id, softDelete);
 
   if (!passportPossession) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });

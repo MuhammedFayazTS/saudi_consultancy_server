@@ -17,6 +17,7 @@ export interface IPassportPossession extends Document {
   receivedToClientDate: Date;
   receivedToClientDeliveryMethod: string;
   remarks: string;
+  isDeleted: Boolean;
 }
 
 const PassportPossessionSchema = new Schema<IPassportPossession>(
@@ -44,7 +45,6 @@ const PassportPossessionSchema = new Schema<IPassportPossession>(
     workAgreementDate: {
       type: Date,
     },
-
     stampingStatus: {
       type: String,
       trim: true,
@@ -72,6 +72,7 @@ const PassportPossessionSchema = new Schema<IPassportPossession>(
       type: String,
       trim: true,
     },
+    isDeleted: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,
