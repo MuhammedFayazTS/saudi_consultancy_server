@@ -11,7 +11,7 @@ export const createCustomer = asyncHandler(async (req: Request, res: Response) =
   const payload = customerZodSchema.parse(req.body);
   const { name } = payload;
 
-  const exists = await Customer.findOne({ name });
+  const exists = await Customer.findOne({ name, ...notDeleted });
   if (exists) {
     res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "Customer already exists" });
     return;
@@ -114,7 +114,7 @@ export const listCustomers = asyncHandler(async (req: Request, res: Response) =>
 export const getOneCustomer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const customer = await Customer.findById(id);
+  const customer = await Customer.findById(id).where(notDeleted);
   if (!customer) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Customer not found" });
     return;
@@ -133,7 +133,7 @@ export const updateCustomer = asyncHandler(async (req: Request, res: Response) =
   const customer = await Customer.findByIdAndUpdate(id, inputParams, {
     new: true, // return updated document
     runValidators: true,
-  });
+  }).where(notDeleted);
 
   if (!customer) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Customer not found" });
@@ -163,7 +163,9 @@ export const listForSelectCustomers = asyncHandler(async (req: Request, res: Res
 export const deleteCustomer = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const customer = await Customer.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+  const customer = await Customer.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).where(
+    notDeleted
+  );
 
   if (!customer) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Customer not found" });
