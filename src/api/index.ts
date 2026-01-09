@@ -6,6 +6,7 @@ import { authGuard } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
+import medicalPaymentRoutes from "./medical-payment.routes.js";
 import passportPossessionRoutes from "./passport-possession.routes.js";
 import ticketRoutes from "./ticket.routes";
 import transactionRoutes from "./transaction.routes.js";
@@ -39,5 +40,6 @@ router.use("/users", userRoutes);
 router.use("/tickets", ticketRoutes);
 router.use("/passport-possession", passportPossessionRoutes);
 router.use("/transaction", transactionRoutes);
+router.use("/medical-payment", medicalPaymentRoutes);
 
 export default router;
