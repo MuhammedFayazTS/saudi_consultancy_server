@@ -2,6 +2,8 @@ import type { Types } from "mongoose";
 
 import mongoose, { Schema } from "mongoose";
 
+import { setVirtualDateFormats } from "./helper.js";
+
 export interface ITransaction {
   name: string;
   customerId: Types.ObjectId;
@@ -45,18 +47,7 @@ const TransactionSchema = new Schema<ITransaction>(
 );
 
 TransactionSchema.virtual("formattedCreatedAt").get(function () {
-  if (!this.createdAt) return null;
-  const d = new Date(this.createdAt);
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const year = d.getFullYear();
-  let hours = d.getHours();
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-  const ampm = hours >= 12 ? "pm" : "am";
-  hours = hours % 12;
-  hours = hours || 12;
-  const strTime = `${String(hours).padStart(2, "0")}.${minutes} ${ampm}`;
-  return `${month}/${day}/${year} ${strTime}`;
+  return setVirtualDateFormats(this.createdAt);
 });
 
 export const Transaction =

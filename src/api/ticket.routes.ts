@@ -1,22 +1,22 @@
 import express from "express";
 
 import {
-  create,
-  list,
-  getOne,
-  update,
-  listForSelect,
-  destroy,
+  createTicket,
+  destroyTicket,
+  getOneTicket,
+  listForSelectTicket,
+  listTickets,
+  updateTicket,
 } from "../controllers/ticket.controller";
 import { authGuard } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/", authGuard, create);
-router.get("/", authGuard, list);
-router.get("/select", authGuard, listForSelect);
-router.get("/:id", authGuard, getOne);
-router.put("/:id", authGuard, update);
-router.delete("/:id", authGuard, destroy);
+router.post("/", authGuard, createTicket);
+router.get("/", authGuard, listTickets);
+router.get("/select", authGuard, listForSelectTicket);
+router.get("/:id", authGuard, getOneTicket);
+router.put("/:id", authGuard, updateTicket);
+router.delete("/:id", authGuard, destroyTicket);
 
 export default router;

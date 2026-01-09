@@ -1,34 +1,29 @@
 import type { Request, Response } from "express";
+import type { ObjectId } from "mongoose";
 
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { Ticket } from "../models/ticket.model";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
+import { TicketZodSchema } from "../utils/validators/ticket.schema.js";
 
-export const create = asyncHandler(async (req: Request, res: Response) => {
-  const inputParams = req.body;
-  const { customerId } = inputParams;
+export const createTicket = asyncHandler(async (req: Request, res: Response) => {
+  const inputParams = TicketZodSchema.parse(req.body);
+  console.warn('inputparams', inputParams)
 
-  const transaction = await createTransaction({
-    name: "Ticket Booking",
-    customerId,
-    isDeleted: false,
+  const { transactionId, ...rest } = inputParams;
+  const parsedTransactionId = transactionId as unknown as ObjectId;
+
+  const ticket = await Ticket.create({
+    ...rest,
+    transactionId: parsedTransactionId,
   });
-
-  const exists = await Ticket.findOne({ ...inputParams, transactionId: transaction._id });
-  if (exists) {
-    res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "Ticket already exists" });
-    return;
-  }
-
-  req.body.transactionId = transaction._id;
-  const ticket = await Ticket.create(req.body);
 
   res.status(HTTPSTATUS.CREATED).json({ message: "Ticket registered successfully", ticket });
 });
 
-export const list = asyncHandler(async (req: Request, res: Response) => {
+export const listTickets = asyncHandler(async (req: Request, res: Response) => {
   const {
     page = "1",
     limit = "10",
@@ -48,9 +43,12 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   };
 
   // filters
-  if (rest.travelType) query.travelType = rest.travelType;
-  if (rest.airlineCompany) query.airlineCompany = rest.airlineCompany;
-  if (rest.paymentMode) query.paymentMode = rest.paymentMode;
+  if (rest.travelType) 
+    query.travelType = rest.travelType;
+  if (rest.airlineCompany) 
+     query.airlineCompany = rest.airlineCompany;
+  if (rest.paymentMode) 
+     query.paymentMode = rest.paymentMode;
 
   // field projection
   const { fields } = req.query;
@@ -68,6 +66,9 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
       "paymentMode",
       "createdAt",
       "updatedAt",
+      "formattedCreatedAt",
+      "formattedBookingDate",
+      "formattedTravellingDate",
     ];
 
     const selected = String(fields)
@@ -75,7 +76,8 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) projection = selected.join(" ");
+    if (selected.length) 
+     projection = selected.join(" ");
   }
 
   // sorting
@@ -85,7 +87,6 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   // counts
   const total = await Ticket.countDocuments(query);
   const pages = Math.max(1, Math.ceil(total / limitNum));
-  console.log("query", query);
   // fetch
   const tickets = await Ticket.find(query)
     .populate({
@@ -99,11 +100,10 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
     .sort(sort)
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum)
-    .select(projection)
-    .lean();
+    .select(projection);
 
   const data = tickets.map((ticket) => ({
-    ...ticket,
+    ...ticket.toObject(),
     customerName: (ticket.transactionId as any)?.customerId?.name || "",
   }));
 
@@ -118,10 +118,13 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const getOne = asyncHandler(async (req: Request, res: Response) => {
+export const getOneTicket = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const ticket = await Ticket.findById(id);
+  const ticket = await Ticket.findById(id).populate({
+      path: "transactionId",
+      select: "name",
+    });
   if (!ticket) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Ticket not found" });
     return;
@@ -133,7 +136,7 @@ export const getOne = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const update = asyncHandler(async (req: Request, res: Response) => {
+export const updateTicket = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const ticket = await Ticket.findByIdAndUpdate(id, req.body, {
@@ -152,7 +155,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export const listForSelect = asyncHandler(async (req: Request, res: Response) => {
+export const listForSelectTicket = asyncHandler(async (req: Request, res: Response) => {
   const tickets = await Ticket.find(notDeleted, { _id: 1, transactionId: 1 })
     .populate("transactionId", "name")
     .sort({ _id: 1 });
@@ -168,7 +171,7 @@ export const listForSelect = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
-export const destroy = asyncHandler(async (req: Request, res: Response) => {
+export const destroyTicket = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const ticket = await Ticket.findByIdAndDelete(id, softDelete);
