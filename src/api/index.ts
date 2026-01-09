@@ -37,7 +37,7 @@ router.get("/test-auth", authGuard, allowRoles("admin"), (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/customer", customerRoutes);
 router.use("/users", userRoutes);
-router.use("/tickets", ticketRoutes);
+router.use("/ticket", ticketRoutes);
 router.use("/passport-possession", passportPossessionRoutes);
 router.use("/transaction", transactionRoutes);
 router.use("/medical-payment", medicalPaymentRoutes);

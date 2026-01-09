@@ -1,9 +1,11 @@
-import type { Document, Types } from "mongoose";
+import type { Document, ObjectId } from "mongoose";
 
 import mongoose, { Schema } from "mongoose";
 
+import { setVirtualDateFormats } from "./helper.js";
+
 export interface ITicket extends Document {
-  transactionId: Types.ObjectId;
+  transactionId: ObjectId;
   travelType: string;
   bookingDate: Date;
   travellingDate: Date;
@@ -31,18 +33,15 @@ const TicketSchema = new Schema<ITicket>(
 );
 
 TicketSchema.virtual("formattedCreatedAt").get(function () {
-  if (!this.createdAt) return null;
-  const d = new Date(this.createdAt);
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const year = d.getFullYear();
-  let hours = d.getHours();
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-  const ampm = hours >= 12 ? "pm" : "am";
-  hours = hours % 12;
-  hours = hours || 12;
-  const strTime = `${String(hours).padStart(2, "0")}.${minutes} ${ampm}`;
-  return `${month}/${day}/${year} ${strTime}`;
+  return setVirtualDateFormats(this.createdAt);
+});
+
+TicketSchema.virtual("formattedBookingDate").get(function () {
+  return setVirtualDateFormats(this.bookingDate);
+});
+
+TicketSchema.virtual("formattedTravellingDate").get(function () {
+  return setVirtualDateFormats(this.travellingDate);
 });
 
 export const Ticket = mongoose.model<ITicket>("Ticket", TicketSchema);
