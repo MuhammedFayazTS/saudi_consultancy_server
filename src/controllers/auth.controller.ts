@@ -27,8 +27,18 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const { email, phone, password } = req.body;
+
+  const query: any[] = [];
+  if (email) query.push({ email });
+  if (phone) query.push({ phone });
+
+  if (query.length === 0) {
+    res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "Email or phone is required" });
+    return;
+  }
+
+  const user = await User.findOne({ $or: query });
   if (!user || !(await user.matchPassword(password))) {
     res.status(HTTPSTATUS.UNAUTHORIZED).json({ message: "Invalid credentials" });
     return;
