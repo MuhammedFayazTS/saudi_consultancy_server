@@ -14,6 +14,19 @@ export const createPassportPossession = asyncHandler(async (req: Request, res: R
   const { customerId, ...rest } = inputParams;
   const parsedCustomerId = customerId as unknown as ObjectId;
 
+  // Check if already another passport possession for existing customer exist
+  const existingPossession = await PassportPossession.findOne({
+    customerId: parsedCustomerId,
+    ...notDeleted,
+  });
+
+  if (existingPossession) {
+    res.status(HTTPSTATUS.BAD_REQUEST).json({
+      message: "Customer already has an active Passport Possession record.",
+    });
+    return;
+  }
+
   const passportPossession = await PassportPossession.create({
     ...rest,
     customerId: parsedCustomerId,
