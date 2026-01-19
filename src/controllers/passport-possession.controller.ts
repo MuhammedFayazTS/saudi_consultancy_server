@@ -5,6 +5,7 @@ import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { PassportPossession } from "../models/passport-possession.model.js";
+import { Customer } from "../models/customer.model.js";
 import { PassportPossessionZodSchema } from "../utils/validators/passport-possession.schema.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 
@@ -78,23 +79,45 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
     const s = String(search).trim();
     const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(esc, "i");
-    filter.$or = [{ agency: regex }];
-  }
 
+    const matchingCustomers = await Customer.find({
+      $or: [
+        { name: regex },
+        { passportNumber: regex },
+        { contactNumber1: regex },
+        { contactNumber2: regex },
+      ],
+      ...notDeleted,
+    }).select("_id");
+
+    const customerIds = matchingCustomers.map((c) => c._id);
+    
+    filter.$or = [{ agency: regex }, { customerId: { $in: customerIds } }];
+  }
+  
   const sort: Record<string, 1 | -1> = {};
   sort[String(sortBy)] = String(sortOrder).toLowerCase() === "asc" ? 1 : -1;
-
+  
   const total = await PassportPossession.countDocuments(filter);
   const pages = Math.max(1, Math.ceil(total / limitNum));
-
+  
   const passportPossessions = await PassportPossession.find(filter)
-    .sort(sort)
-    .skip((pageNum - 1) * limitNum)
-    .limit(limitNum)
-    .lean();
+  .sort(sort)
+  .skip((pageNum - 1) * limitNum)
+  .limit(limitNum)
+  .populate("customerId")
+  .lean();
+  
+  const dataWithCustomer = passportPossessions.map((item: any) => {
+    return {
+      ...item,
+      customer: item.customerId,
+      customerId: item.customerId?._id,
+    };
+  });
 
   res.status(HTTPSTATUS.OK).json({
-    data: passportPossessions,
+    data: dataWithCustomer,
     meta: {
       total,
       page: pageNum,
@@ -107,9 +130,7 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
 export const getPassportPossessionById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const passportPossession = await PassportPossession.findById(id);
-
-  console.log(passportPossession);
+  const passportPossession = await PassportPossession.findById(id).populate("customerId").lean();
 
   if (!passportPossession) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
@@ -118,7 +139,11 @@ export const getPassportPossessionById = asyncHandler(async (req: Request, res: 
 
   res.status(HTTPSTATUS.OK).json({
     message: "Passport Possession fetched successfully",
-    data: passportPossession,
+    data: {
+      ...passportPossession,
+      customer: (passportPossession as any).customerId,
+      customerId: (passportPossession as any).customerId?._id,
+    },
   });
 });
 

@@ -24,7 +24,7 @@ const PassportPossessionSchema = new Schema<IPassportPossession>(
   {
     customerId: {
       type: Schema.Types.ObjectId,
-      ref: "Transaction",
+      ref: "Customer",
       required: true,
     },
     agency: {
