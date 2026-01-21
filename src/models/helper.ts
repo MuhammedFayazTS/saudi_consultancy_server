@@ -1,6 +1,5 @@
 export function setVirtualDateFormats(col: Date | undefined | null) {
-  if (!col) 
-return null;
+  if (!col) return null;
   const d = new Date(col);
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");

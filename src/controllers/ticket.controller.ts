@@ -10,7 +10,7 @@ import { TicketZodSchema } from "../utils/validators/ticket.schema.js";
 
 export const createTicket = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = TicketZodSchema.parse(req.body);
-  console.warn('inputparams', inputParams)
+  console.warn("inputparams", inputParams);
 
   const { transactionId, ...rest } = inputParams;
   const parsedTransactionId = transactionId as unknown as ObjectId;
@@ -43,12 +43,9 @@ export const listTickets = asyncHandler(async (req: Request, res: Response) => {
   };
 
   // filters
-  if (rest.travelType) 
-    query.travelType = rest.travelType;
-  if (rest.airlineCompany) 
-     query.airlineCompany = rest.airlineCompany;
-  if (rest.paymentMode) 
-     query.paymentMode = rest.paymentMode;
+  if (rest.travelType) query.travelType = rest.travelType;
+  if (rest.airlineCompany) query.airlineCompany = rest.airlineCompany;
+  if (rest.paymentMode) query.paymentMode = rest.paymentMode;
 
   // field projection
   const { fields } = req.query;
@@ -76,8 +73,7 @@ export const listTickets = asyncHandler(async (req: Request, res: Response) => {
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) 
-     projection = selected.join(" ");
+    if (selected.length) projection = selected.join(" ");
   }
 
   // sorting
@@ -122,9 +118,9 @@ export const getOneTicket = asyncHandler(async (req: Request, res: Response) => 
   const { id } = req.params;
 
   const ticket = await Ticket.findById(id).populate({
-      path: "transactionId",
-      select: "name",
-    });
+    path: "transactionId",
+    select: "name",
+  });
   if (!ticket) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Ticket not found" });
     return;

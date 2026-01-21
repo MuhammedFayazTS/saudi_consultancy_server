@@ -80,14 +80,25 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
   const total = await MedicalPayment.countDocuments(query);
   const pages = Math.max(1, Math.ceil(total / limitNum));
 
+  const include = {
+    path: "transactionId",
+    select: "customerId, name",
+    populate: {
+      path: "customerId",
+      select: "name",
+    },
+  };
+
   // fetch
   const medicalPayments = await MedicalPayment.find(query)
-    .populate("transactionId")
+    .populate(include)
     .sort(sort)
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum)
     .select(projection)
     .lean();
+
+  console.log("medicalPayments list data", medicalPayments);
 
   res.status(HTTPSTATUS.OK).json({
     data: medicalPayments,
@@ -103,13 +114,12 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
 export const getOneMedicalPayment = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const medicalPayment = await MedicalPayment.findById(id)
-    .populate("transactionId")
-    .where(notDeleted);
+  const medicalPayment = await MedicalPayment.findById(id).where(notDeleted);
   if (!medicalPayment) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Medical payment not found" });
     return;
   }
+  console.log("medicalPayment12345", medicalPayment);
 
   res.status(HTTPSTATUS.OK).json({
     success: true,
