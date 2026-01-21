@@ -10,8 +10,6 @@ import { TicketZodSchema } from "../utils/validators/ticket.schema.js";
 
 export const createTicket = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = TicketZodSchema.parse(req.body);
-  console.warn("inputparams", inputParams);
-
   const { transactionId, ...rest } = inputParams;
   const parsedTransactionId = transactionId as unknown as ObjectId;
 
@@ -117,10 +115,7 @@ export const listTickets = asyncHandler(async (req: Request, res: Response) => {
 export const getOneTicket = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const ticket = await Ticket.findById(id).populate({
-    path: "transactionId",
-    select: "name",
-  });
+  const ticket = await Ticket.findById(id);
   if (!ticket) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Ticket not found" });
     return;

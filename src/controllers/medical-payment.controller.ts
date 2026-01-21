@@ -36,8 +36,10 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
   };
 
   // filters
-  if (rest.transactionId) query.transactionId = rest.transactionId;
-  if (rest.paymentMode) query.paymentMode = rest.paymentMode;
+  if (rest.transactionId) 
+query.transactionId = rest.transactionId;
+  if (rest.paymentMode) 
+query.paymentMode = rest.paymentMode;
 
   // search (amount, remarks)
   if (search) {
@@ -69,7 +71,8 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) projection = selected.join(" ");
+    if (selected.length) 
+projection = selected.join(" ");
   }
 
   // sorting
@@ -98,7 +101,7 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
     .select(projection)
     .lean();
 
-  console.log("medicalPayments list data", medicalPayments);
+  console.warn("medicalPayments list data", medicalPayments);
 
   res.status(HTTPSTATUS.OK).json({
     data: medicalPayments,
@@ -119,7 +122,7 @@ export const getOneMedicalPayment = asyncHandler(async (req: Request, res: Respo
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Medical payment not found" });
     return;
   }
-  console.log("medicalPayment12345", medicalPayment);
+  console.warn("medicalPayment12345", medicalPayment);
 
   res.status(HTTPSTATUS.OK).json({
     success: true,
