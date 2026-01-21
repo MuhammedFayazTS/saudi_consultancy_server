@@ -91,23 +91,23 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
     }).select("_id");
 
     const customerIds = matchingCustomers.map((c) => c._id);
-    
+
     filter.$or = [{ agency: regex }, { customerId: { $in: customerIds } }];
   }
-  
+
   const sort: Record<string, 1 | -1> = {};
   sort[String(sortBy)] = String(sortOrder).toLowerCase() === "asc" ? 1 : -1;
-  
+
   const total = await PassportPossession.countDocuments(filter);
   const pages = Math.max(1, Math.ceil(total / limitNum));
-  
+
   const passportPossessions = await PassportPossession.find(filter)
-  .sort(sort)
-  .skip((pageNum - 1) * limitNum)
-  .limit(limitNum)
-  .populate("customerId")
-  .lean();
-  
+    .sort(sort)
+    .skip((pageNum - 1) * limitNum)
+    .limit(limitNum)
+    .populate("customerId")
+    .lean();
+
   const dataWithCustomer = passportPossessions.map((item: any) => {
     return {
       ...item,

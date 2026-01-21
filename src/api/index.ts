@@ -7,6 +7,7 @@ import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
 import medicalPaymentRoutes from "./medical-payment.routes.js";
+import medicalStatusRoutes from "./medical-status.routes.js";
 import passportPossessionRoutes from "./passport-possession.routes.js";
 import ticketRoutes from "./ticket.routes";
 import transactionRoutes from "./transaction.routes.js";
@@ -41,5 +42,6 @@ router.use("/ticket", ticketRoutes);
 router.use("/passport-possession", passportPossessionRoutes);
 router.use("/transaction", transactionRoutes);
 router.use("/medical-payment", medicalPaymentRoutes);
+router.use("/medical-status", medicalStatusRoutes);
 
 export default router;
