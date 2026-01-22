@@ -36,10 +36,8 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
   };
 
   // filters
-  if (rest.transactionId) 
-query.transactionId = rest.transactionId;
-  if (rest.paymentMode) 
-query.paymentMode = rest.paymentMode;
+  if (rest.transactionId) query.transactionId = rest.transactionId;
+  if (rest.paymentMode) query.paymentMode = rest.paymentMode;
 
   // search (amount, remarks)
   if (search) {
@@ -71,8 +69,7 @@ query.paymentMode = rest.paymentMode;
       .map((f) => f.trim())
       .filter((f) => allowedFields.includes(f));
 
-    if (selected.length) 
-projection = selected.join(" ");
+    if (selected.length) projection = selected.join(" ");
   }
 
   // sorting
