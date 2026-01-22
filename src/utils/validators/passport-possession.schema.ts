@@ -10,8 +10,8 @@ export const PassportPossessionZodSchema = z.object({
   agencyDeliveryDate: z.coerce.date().optional(),
 
   workAgreementStatus: z.string().trim().optional(),
-  workAgreementRecievedInRiyadhDate: z.coerce.date().optional(),
-  workAgreementDate: z.coerce.date().optional(),
+  workAgreementOnProcessingInRiyadhDate: z.coerce.date().optional(),
+  workAgreementRecievedInManjeriDate: z.coerce.date().optional(),
 
   stampingStatus: z.string().trim().optional(),
   stampingDate: z.coerce.date().optional(),

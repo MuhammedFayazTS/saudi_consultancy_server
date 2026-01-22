@@ -8,7 +8,8 @@ export interface IPassportPossession extends Document {
   agencyDeliveryMethod: string;
   agencyDeliveryDate: Date;
   workAgreementStatus: string;
-  workAgreementDate: Date;
+  workAgreementOnProcessingInRiyadhDate: Date;
+  workAgreementRecievedInManjeriDate: Date;
   stampingStatus: string;
   stampingDate: Date;
   stampingRemarks: string;
@@ -42,7 +43,10 @@ const PassportPossessionSchema = new Schema<IPassportPossession>(
       type: String,
       trim: true,
     },
-    workAgreementDate: {
+    workAgreementOnProcessingInRiyadhDate: {
+      type: Date,
+    },
+    workAgreementRecievedInManjeriDate: {
       type: Date,
     },
     stampingStatus: {
