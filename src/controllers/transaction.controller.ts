@@ -136,10 +136,12 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const listForSelect = asyncHandler(async (req: Request, res: Response) => {
-  const transactions = await Transaction.find(notDeleted, { _id: 1, name: 1 }).sort({ id: 1 });
+  const transactions = await Transaction.find(notDeleted, { _id: 1, name: 1 })
+    .populate("customerId", "name passportNumber")
+    .sort({ id: 1 });
 
   const options = transactions.map((transaction) => ({
-    label: transaction.name,
+    label: transaction.name + " - " + transaction.customerId?.name + " (" + transaction.customerId?.passportNumber + ")",
     value: transaction._id,
   }));
 
