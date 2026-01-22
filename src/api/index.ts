@@ -12,6 +12,7 @@ import passportPossessionRoutes from "./passport-possession.routes.js";
 import ticketRoutes from "./ticket.routes";
 import transactionRoutes from "./transaction.routes.js";
 import userRoutes from "./user.routes";
+import vfsRoutes from "./vfs.routes.js";
 
 const router = express.Router();
 
@@ -43,5 +44,6 @@ router.use("/passport-possession", passportPossessionRoutes);
 router.use("/transaction", transactionRoutes);
 router.use("/medical-payment", medicalPaymentRoutes);
 router.use("/medical-status", medicalStatusRoutes);
+router.use("/vfs", vfsRoutes);
 
 export default router;
