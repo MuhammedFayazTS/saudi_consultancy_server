@@ -3,7 +3,7 @@ import type { ObjectId } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
 export interface IPassportPossession extends Document {
-  customerId: ObjectId;
+  transactionId: ObjectId;
   agency: string;
   agencyDeliveryMethod: string;
   agencyDeliveryDate: Date;
@@ -22,9 +22,9 @@ export interface IPassportPossession extends Document {
 
 const PassportPossessionSchema = new Schema<IPassportPossession>(
   {
-    customerId: {
+    transactionId: {
       type: Schema.Types.ObjectId,
-      ref: "Customer",
+      ref: "Transaction",
       required: true,
     },
     agency: {
