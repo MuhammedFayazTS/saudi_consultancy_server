@@ -3,15 +3,15 @@ import { z } from "zod";
 import { objectIdSchema } from "../zod.helper";
 
 export const PassportPossessionZodSchema = z.object({
-  customerId: objectIdSchema,
+  transactionId: objectIdSchema,
 
   agency: z.string().trim().optional(),
   agencyDeliveryMethod: z.string().trim().optional(),
   agencyDeliveryDate: z.coerce.date().optional(),
 
   workAgreementStatus: z.string().trim().optional(),
-  workAgreementRecievedInRiyadhDate: z.coerce.date().optional(),
-  workAgreementDate: z.coerce.date().optional(),
+  workAgreementOnProcessingInRiyadhDate: z.coerce.date().optional(),
+  workAgreementRecievedInManjeriDate: z.coerce.date().optional(),
 
   stampingStatus: z.string().trim().optional(),
   stampingDate: z.coerce.date().optional(),

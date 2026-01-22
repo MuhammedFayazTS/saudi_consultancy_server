@@ -4,33 +4,34 @@ import type { ObjectId } from "mongoose";
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
-import { PassportPossession } from "../models/passport-possession.model.js";
 import { Customer } from "../models/customer.model.js";
+import { PassportPossession } from "../models/passport-possession.model.js";
+import { Transaction } from "../models/transaction.model.js";
 import { PassportPossessionZodSchema } from "../utils/validators/passport-possession.schema.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 
 export const createPassportPossession = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = PassportPossessionZodSchema.parse(req.body);
 
-  const { customerId, ...rest } = inputParams;
-  const parsedCustomerId = customerId as unknown as ObjectId;
+  const { transactionId, ...rest } = inputParams;
+  const parsedTransactionId = transactionId as unknown as ObjectId;
 
-  // Check if already another passport possession for existing customer exist
+  // Check if already another passport possession for existing transaction exist
   const existingPossession = await PassportPossession.findOne({
-    customerId: parsedCustomerId,
+    transactionId: parsedTransactionId,
     ...notDeleted,
   });
 
   if (existingPossession) {
     res.status(HTTPSTATUS.BAD_REQUEST).json({
-      message: "Customer already has an active Passport Possession record.",
+      message: "transaction already has an active Passport Possession record.",
     });
     return;
   }
 
   const passportPossession = await PassportPossession.create({
     ...rest,
-    customerId: parsedCustomerId,
+    transactionId: parsedTransactionId,
   });
 
   res
@@ -42,7 +43,7 @@ export const updatePassportPossession = asyncHandler(async (req: Request, res: R
   const { id } = req.params;
   const inputParams = PassportPossessionZodSchema.partial().parse(req.body);
 
-  delete (inputParams as any).customerId;
+  // delete (inputParams as any).transactionId;
 
   const passportPossession = await PassportPossession.findByIdAndUpdate(
     id,
@@ -62,7 +63,7 @@ export const updatePassportPossession = asyncHandler(async (req: Request, res: R
 });
 
 export const listPassportPossessions = asyncHandler(async (req: Request, res: Response) => {
-  const { customerId, search, sortBy, sortOrder, page, limit } = req.query;
+  const { transactionId, search, sortBy, sortOrder, page, limit } = req.query;
 
   const pageNum = Math.max(1, Number.parseInt(String(page), 10) || 1);
   const limitNum = Math.min(100, Math.max(1, Number.parseInt(String(limit), 10) || 10));
@@ -71,8 +72,8 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
     ...notDeleted,
   };
 
-  if (customerId) {
-    filter.customerId = customerId;
+  if (transactionId) {
+    filter.transactionId = transactionId;
   }
 
   if (search) {
@@ -92,7 +93,14 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
 
     const customerIds = matchingCustomers.map((c) => c._id);
 
-    filter.$or = [{ agency: regex }, { customerId: { $in: customerIds } }];
+    const matchingTransactions = await Transaction.find({
+      $or: [{ name: regex }, { customerId: { $in: customerIds } }],
+      ...notDeleted,
+    }).select("_id");
+
+    const transactionIds = matchingTransactions.map((c) => c._id);
+
+    filter.$or = [{ agency: regex }, { transactionId: { $in: transactionIds } }];
   }
 
   const sort: Record<string, 1 | -1> = {};
@@ -105,19 +113,28 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
     .sort(sort)
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum)
-    .populate("customerId")
+    .populate({
+      path: "transactionId",
+      populate: {
+        path: "customerId",
+      },
+    })
     .lean();
 
-  const dataWithCustomer = passportPossessions.map((item: any) => {
+  const dataWithTransaction = passportPossessions.map((item: any) => {
+    const transaction = item.transactionId;
+    if (transaction && transaction.customerId) {
+      transaction.customer = transaction.customerId;
+    }
     return {
       ...item,
-      customer: item.customerId,
-      customerId: item.customerId?._id,
+      transaction: transaction,
+      transactionId: transaction?._id,
     };
   });
 
   res.status(HTTPSTATUS.OK).json({
-    data: dataWithCustomer,
+    data: dataWithTransaction,
     meta: {
       total,
       page: pageNum,
@@ -130,19 +147,31 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
 export const getPassportPossessionById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const passportPossession = await PassportPossession.findById(id).populate("customerId").lean();
+  const passportPossession = await PassportPossession.findById(id)
+    .populate({
+      path: "transactionId",
+      populate: {
+        path: "customerId",
+      },
+    })
+    .lean();
 
   if (!passportPossession) {
     res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
     return;
   }
 
+  const transaction = (passportPossession as any).transactionId;
+  if (transaction && transaction.customerId) {
+    transaction.customer = transaction.customerId;
+  }
+
   res.status(HTTPSTATUS.OK).json({
     message: "Passport Possession fetched successfully",
     data: {
       ...passportPossession,
-      customer: (passportPossession as any).customerId,
-      customerId: (passportPossession as any).customerId?._id,
+      transaction: transaction,
+      transactionId: transaction?._id,
     },
   });
 });
