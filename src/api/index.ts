@@ -13,6 +13,7 @@ import ticketRoutes from "./ticket.routes";
 import transactionRoutes from "./transaction.routes.js";
 import userRoutes from "./user.routes";
 import vfsRoutes from "./vfs.routes.js";
+import visaDetailsRoutes from "./visa-details.routes.js";
 
 const router = express.Router();
 
@@ -45,5 +46,6 @@ router.use("/transaction", transactionRoutes);
 router.use("/medical-payment", medicalPaymentRoutes);
 router.use("/medical-status", medicalStatusRoutes);
 router.use("/vfs", vfsRoutes);
+router.use("/visa-details", visaDetailsRoutes);
 
 export default router;
