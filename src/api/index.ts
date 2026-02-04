@@ -6,6 +6,7 @@ import { authGuard } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
+import ksaStatusRoutes from "./ksa-status.routes.js";
 import medicalPaymentRoutes from "./medical-payment.routes.js";
 import medicalStatusRoutes from "./medical-status.routes.js";
 import passportPossessionRoutes from "./passport-possession.routes.js";
@@ -49,5 +50,6 @@ router.use("/medical-status", medicalStatusRoutes);
 router.use("/trade-certificate", tradeCertificateRoutes);
 router.use("/vfs", vfsRoutes);
 router.use("/visa-details", visaDetailsRoutes);
+router.use("/ksa-status", ksaStatusRoutes);
 
 export default router;
