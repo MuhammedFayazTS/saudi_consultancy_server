@@ -4,7 +4,9 @@ import type { ObjectId } from "mongoose";
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
+import { Customer } from "../models/customer.model.js";
 import { Ticket } from "../models/ticket.model";
+import { Transaction } from "../models/transaction.model.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 import { TicketZodSchema } from "../utils/validators/ticket.schema.js";
 
@@ -44,6 +46,37 @@ export const listTickets = asyncHandler(async (req: Request, res: Response) => {
   if (rest.travelType) query.travelType = rest.travelType;
   if (rest.airlineCompany) query.airlineCompany = rest.airlineCompany;
   if (rest.paymentMode) query.paymentMode = rest.paymentMode;
+  if (rest.transactionId) query.transactionId = rest.transactionId;
+
+  // search (customer name, transaction name, airline, travel type)
+  if (search) {
+    const s = String(search).trim();
+    const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(esc, "i");
+
+    // Search in customer names and transaction names
+    const matchingCustomers = await Customer.find({
+      $or: [{ name: regex }],
+      ...notDeleted,
+    }).select("_id");
+
+    const customerIds = matchingCustomers.map((c) => c._id);
+
+    const matchingTransactions = await Transaction.find({
+      $or: [{ name: regex }, { customerId: { $in: customerIds } }],
+      ...notDeleted,
+    }).select("_id");
+
+    const transactionIds = matchingTransactions.map((t) => t._id);
+
+    // Add ticket field searches and transaction-based searches
+    query.$or = [
+      { airlineCompany: regex },
+      { travelType: regex },
+      { paymentMode: regex },
+      { transactionId: { $in: transactionIds } },
+    ];
+  }
 
   // field projection
   const { fields } = req.query;
@@ -85,7 +118,7 @@ export const listTickets = asyncHandler(async (req: Request, res: Response) => {
   const tickets = await Ticket.find(query)
     .populate({
       path: "transactionId",
-      select: "customerId",
+      select: "customerId name",
       populate: {
         path: "customerId",
         select: "name",
@@ -99,6 +132,7 @@ export const listTickets = asyncHandler(async (req: Request, res: Response) => {
   const data = tickets.map((ticket) => ({
     ...ticket.toObject(),
     customerName: (ticket.transactionId as any)?.customerId?.name || "",
+    transactionName: (ticket.transactionId as any)?.name || "",
   }));
 
   res.status(HTTPSTATUS.OK).json({

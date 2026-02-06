@@ -18,7 +18,7 @@ export interface IPassportPossession extends Document {
   receivedToClientDate: Date;
   receivedToClientDeliveryMethod: string;
   remarks: string;
-  isDeleted: Boolean;
+  isDeleted: boolean;
 }
 
 const PassportPossessionSchema = new Schema<IPassportPossession>(

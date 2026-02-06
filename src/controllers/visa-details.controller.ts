@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
+import { Customer } from "../models/customer.model.js";
+import { Transaction } from "../models/transaction.model.js";
 import { VisaDetails } from "../models/visa-details.model.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 import { visaDetailsZodSchema } from "../utils/validators/visa-details.schema.js";
@@ -42,11 +44,26 @@ export const listVisaDetails = asyncHandler(async (req: Request, res: Response) 
   if (rest.profession) query.profession = rest.profession;
   if (rest.agency) query.agency = rest.agency;
 
-  // search (visaNumber, visaType, profession, agency, remarks)
+  // search (visaNumber, visaType, profession, agency, remarks, customer name, transaction name)
   if (search) {
     const s = String(search).trim();
     const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(esc, "i");
+
+    // Search in customer names and transaction names
+    const matchingCustomers = await Customer.find({
+      $or: [{ name: regex }],
+      ...notDeleted,
+    }).select("_id");
+
+    const customerIds = matchingCustomers.map((c) => c._id);
+
+    const matchingTransactions = await Transaction.find({
+      $or: [{ name: regex }, { customerId: { $in: customerIds } }],
+      ...notDeleted,
+    }).select("_id");
+
+    const transactionIds = matchingTransactions.map((t) => t._id);
 
     query.$or = [
       { visaType: regex },
@@ -54,6 +71,7 @@ export const listVisaDetails = asyncHandler(async (req: Request, res: Response) 
       { agency: regex },
       { paymentMode: regex },
       { remarks: regex },
+      { transactionId: { $in: transactionIds } },
     ];
   }
 
@@ -95,14 +113,27 @@ export const listVisaDetails = asyncHandler(async (req: Request, res: Response) 
 
   // fetch
   const visaDetailsList = await VisaDetails.find(query)
+    .populate({
+      path: "transactionId",
+      select: "customerId name",
+      populate: {
+        path: "customerId",
+        select: "name",
+      },
+    })
     .sort(sort)
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum)
-    .select(projection)
-    .lean();
+    .select(projection);
+
+  const data = visaDetailsList.map((vd) => ({
+    ...vd?.toObject(),
+    customerName: (vd?.transactionId as any)?.customerId?.name || "",
+    transactionName: (vd?.transactionId as any)?.name || "",
+  }));
 
   res.status(HTTPSTATUS.OK).json({
-    data: visaDetailsList,
+    data,
     meta: {
       total,
       page: pageNum,

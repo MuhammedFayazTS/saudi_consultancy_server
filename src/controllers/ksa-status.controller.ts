@@ -4,7 +4,9 @@ import type { ObjectId } from "mongoose";
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
+import { Customer } from "../models/customer.model.js";
 import { KsaStatus } from "../models/ksa-status.js";
+import { Transaction } from "../models/transaction.model.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 import { ksaStatusZodSchema } from "../utils/validators/ksa-status.js";
 
@@ -52,7 +54,27 @@ export const listKsaStatuses = asyncHandler(async (req: Request, res: Response) 
     const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(esc, "i");
 
-    query.$or = [{ visaTransferStatus: regex }, { iqamaValidity: regex }, { remarks: regex }];
+    // Search in customer names and transaction names
+    const matchingCustomers = await Customer.find({
+      $or: [{ name: regex }],
+      ...notDeleted,
+    }).select("_id");
+
+    const customerIds = matchingCustomers.map((c) => c._id);
+
+    const matchingTransactions = await Transaction.find({
+      $or: [{ name: regex }, { customerId: { $in: customerIds } }],
+      ...notDeleted,
+    }).select("_id");
+
+    const transactionIds = matchingTransactions.map((t) => t._id);
+
+    query.$or = [
+      { visaTransferStatus: regex },
+      { iqamaValidity: regex },
+      { remarks: regex },
+      { transactionId: { $in: transactionIds } },
+    ];
   }
 
   // field projection
@@ -95,7 +117,7 @@ export const listKsaStatuses = asyncHandler(async (req: Request, res: Response) 
   const ksaStatuses = await KsaStatus.find(query)
     .populate({
       path: "transactionId",
-      select: "customerId",
+      select: "customerId name",
       populate: {
         path: "customerId",
         select: "name",
@@ -109,6 +131,7 @@ export const listKsaStatuses = asyncHandler(async (req: Request, res: Response) 
   const data = ksaStatuses.map((ks) => ({
     ...ks.toObject(),
     customerName: (ks.transactionId as any)?.customerId?.name || "",
+    transactionName: (ks.transactionId as any)?.name || "",
   }));
 
   res.status(HTTPSTATUS.OK).json({

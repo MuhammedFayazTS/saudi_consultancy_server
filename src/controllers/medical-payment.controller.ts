@@ -3,7 +3,9 @@ import type { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
+import { Customer } from "../models/customer.model.js";
 import { MedicalPayment } from "../models/medical-payment.model.js";
+import { Transaction } from "../models/transaction.model.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 import { medicalPaymentZodSchema } from "../utils/validators/medical-payment.schema.js";
 
@@ -39,13 +41,32 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
   if (rest.transactionId) query.transactionId = rest.transactionId;
   if (rest.paymentMode) query.paymentMode = rest.paymentMode;
 
-  // search (amount, remarks)
+  // search (amount, remarks, customer name, transaction name)
   if (search) {
     const s = String(search).trim();
     const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(esc, "i");
 
-    query.$or = [{ remarks: regex }, { paymentMode: regex }];
+    // Search in customer names and transaction names
+    const matchingCustomers = await Customer.find({
+      $or: [{ name: regex }],
+      ...notDeleted,
+    }).select("_id");
+
+    const customerIds = matchingCustomers.map((c) => c._id);
+
+    const matchingTransactions = await Transaction.find({
+      $or: [{ name: regex }, { customerId: { $in: customerIds } }],
+      ...notDeleted,
+    }).select("_id");
+
+    const transactionIds = matchingTransactions.map((t) => t._id);
+
+    query.$or = [
+      { remarks: regex },
+      { paymentMode: regex },
+      { transactionId: { $in: transactionIds } },
+    ];
   }
 
   // field projection
@@ -82,7 +103,7 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
 
   const include = {
     path: "transactionId",
-    select: "customerId, name",
+    select: "customerId name",
     populate: {
       path: "customerId",
       select: "name",
@@ -95,13 +116,16 @@ export const listMedicalPayments = asyncHandler(async (req: Request, res: Respon
     .sort(sort)
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum)
-    .select(projection)
-    .lean();
+    .select(projection);
 
-  console.warn("medicalPayments list data", medicalPayments);
+  const data = medicalPayments.map((mp) => ({
+    ...mp?.toObject(),
+    customerName: (mp?.transactionId as any)?.customerId?.name || "",
+    transactionName: (mp?.transactionId as any)?.name || "",
+  }));
 
   res.status(HTTPSTATUS.OK).json({
-    data: medicalPayments,
+    data,
     meta: {
       total,
       page: pageNum,
