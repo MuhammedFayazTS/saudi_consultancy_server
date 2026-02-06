@@ -4,7 +4,9 @@ import type { ObjectId } from "mongoose";
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
+import { Customer } from "../models/customer.model.js";
 import { TradeCertificate } from "../models/trade-certificate.model.js";
+import { Transaction } from "../models/transaction.model.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
 import { tradeCertificateZodSchema } from "../utils/validators/trade-certificate.js";
 
@@ -52,12 +54,28 @@ export const listTradeCertificates = asyncHandler(async (req: Request, res: Resp
     const esc = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(esc, "i");
 
+    // Search in customer names and transaction names
+    const matchingCustomers = await Customer.find({
+      $or: [{ name: regex }],
+      ...notDeleted,
+    }).select("_id");
+
+    const customerIds = matchingCustomers.map((c) => c._id);
+
+    const matchingTransactions = await Transaction.find({
+      $or: [{ name: regex }, { customerId: { $in: customerIds } }],
+      ...notDeleted,
+    }).select("_id");
+
+    const transactionIds = matchingTransactions.map((t) => t._id);
+
     query.$or = [
       { center: regex },
       { issuedAgency: regex },
       { tcStatus: regex },
       { paymentMethod: regex },
       { remarks: regex },
+      { transactionId: { $in: transactionIds } },
     ];
   }
 
@@ -101,7 +119,7 @@ export const listTradeCertificates = asyncHandler(async (req: Request, res: Resp
   const tradeCertificates = await TradeCertificate.find(query)
     .populate({
       path: "transactionId",
-      select: "customerId",
+      select: "customerId name",
       populate: {
         path: "customerId",
         select: "name",
@@ -115,6 +133,7 @@ export const listTradeCertificates = asyncHandler(async (req: Request, res: Resp
   const data = tradeCertificates.map((tc) => ({
     ...tc?.toObject(),
     customerName: (tc?.transactionId as any)?.customerId?.name || "",
+    transactionName: (tc?.transactionId as any)?.name || "",
   }));
   res.status(HTTPSTATUS.OK).json({
     data,

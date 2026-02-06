@@ -7,8 +7,8 @@ import { HTTPSTATUS } from "../constants/httpstatus.js";
 import { Customer } from "../models/customer.model.js";
 import { PassportPossession } from "../models/passport-possession.model.js";
 import { Transaction } from "../models/transaction.model.js";
-import { PassportPossessionZodSchema } from "../utils/validators/passport-possession.schema.js";
 import { notDeleted, softDelete } from "../utils/db-queries.js";
+import { PassportPossessionZodSchema } from "../utils/validators/passport-possession.schema.js";
 
 export const createPassportPossession = asyncHandler(async (req: Request, res: Response) => {
   const inputParams = PassportPossessionZodSchema.parse(req.body);
@@ -115,11 +115,12 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
     .limit(limitNum)
     .populate({
       path: "transactionId",
+      select: "customerId name",
       populate: {
         path: "customerId",
+        select: "name",
       },
-    })
-    .lean();
+    });
 
   const dataWithTransaction = passportPossessions.map((item: any) => {
     const transaction = item.transactionId;
@@ -128,8 +129,10 @@ export const listPassportPossessions = asyncHandler(async (req: Request, res: Re
     }
     return {
       ...item,
-      transaction: transaction,
+      transaction,
       transactionId: transaction?._id,
+      customerName: transaction?.customerId?.name || "",
+      transactionName: transaction?.name || "",
     };
   });
 
@@ -170,7 +173,7 @@ export const getPassportPossessionById = asyncHandler(async (req: Request, res: 
     message: "Passport Possession fetched successfully",
     data: {
       ...passportPossession,
-      transaction: transaction,
+      transaction,
       transactionId: transaction?._id,
     },
   });
