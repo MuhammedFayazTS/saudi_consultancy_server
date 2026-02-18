@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  title: Travel Agency OTP API
+  version: 1.0.0
+  description: OTP APIs for email-based OTP generation, validation, and resend.
+
+servers:
+  - url: /api
+    description: Default API base
+
+tags:
+  - name: OTP
+    description: OTP session APIs
+
+paths:
+  /otp/generate:
+    post:
+      tags: [OTP]
+      summary: Generate OTP
+      description: Creates a new OTP session and sends OTP to the email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateOtpRequest"
+            examples:
+              example1:
+                value:
+                  email: customer@gmail.com
+                  purpose: LOGIN
+                  module: AUTH
+                  ttlSeconds: 300
+      responses:
+        "201":
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpSuccessResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /otp/validate:
+    post:
+      tags: [OTP]
+      summary: Validate OTP
+      description: Validates OTP entered by user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidateOtpRequest"
+            examples:
+              example1:
+                value:
+                  email: customer@gmail.com
+                  purpose: LOGIN
+                  module: AUTH
+                  otp: "1234"
+      responses:
+        "200":
+          description: OTP verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpValidateSuccessResponse"
+        "400":
+          description: OTP validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpValidateErrorResponse"
+
+  /otp/resend:
+    post:
+      tags: [OTP]
+      summary: Resend OTP
+      description: Resends a new OTP session (cooldown enforced).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendOtpRequest"
+            examples:
+              example1:
+                value:
+                  email: customer@gmail.com
+                  purpose: LOGIN
+                  module: AUTH
+                  ttlSeconds: 300
+      responses:
+        "201":
+          description: OTP resent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpSuccessResponse"
+        "429":
+          description: Cooldown active (too many requests)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpResendCooldownResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    GenerateOtpRequest:
+      type: object
+      required: [email, purpose]
+      properties:
+        email:
+          type: string
+          format: email
+          example: customer@gmail.com
+        purpose:
+          type: string
+          example: LOGIN
+        module:
+          type: string
+          nullable: true
+          example: AUTH
+        ttlSeconds:
+          type: integer
+          minimum: 30
+          maximum: 900
+          example: 300
+
+    ResendOtpRequest:
+      type: object
+      required: [email, purpose]
+      properties:
+        email:
+          type: string
+          format: email
+          example: customer@gmail.com
+        purpose:
+          type: string
+          example: LOGIN
+        module:
+          type: string
+          nullable: true
+          example: AUTH
+        ttlSeconds:
+          type: integer
+          minimum: 30
+          maximum: 900
+          example: 300
+
+    ValidateOtpRequest:
+      type: object
+      required: [email, purpose, otp]
+      properties:
+        email:
+          type: string
+          format: email
+          example: customer@gmail.com
+        purpose:
+          type: string
+          example: LOGIN
+        module:
+          type: string
+          nullable: true
+          example: AUTH
+        otp:
+          type: string
+          pattern: "^[0-9]{4}$"
+          example: "1234"
+
+    OtpSuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: OTP sent successfully
+        data:
+          type: object
+          properties:
+            sessionId:
+              type: string
+              example: 66d9f5f2d8b2f0c90a12aabc
+            expiresAt:
+              type: string
+              format: date-time
+              example: 2026-02-18T12:45:00.000Z
+            email:
+              type: string
+              example: customer@gmail.com
+            purpose:
+              type: string
+              example: LOGIN
+            module:
+              type: string
+              nullable: true
+              example: AUTH
+
+    OtpValidateSuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: OTP verified successfully
+        success:
+          type: boolean
+          example: true
+
+    OtpValidateErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: OTP validation failed
+        reason:
+          type: string
+          enum:
+            - NO_PENDING_OTP
+            - EXPIRED
+            - INVALID_OTP
+            - TOO_MANY_ATTEMPTS
+
+    OtpResendCooldownResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Please wait before requesting another OTP
+        retryAfterSeconds:
+          type: integer
+          example: 18
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Invalid request

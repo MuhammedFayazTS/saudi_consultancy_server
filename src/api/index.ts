@@ -17,6 +17,7 @@ import userRoutes from "./user.routes";
 import vfsRoutes from "./vfs.routes.js";
 import visaDetailsRoutes from "./visa-details.routes.js";
 import agencyPaymentRoutes from "./agency-payment.routes.js";
+import otpRoutes from "./otp.routes.js";
 
 const router = express.Router();
 
@@ -53,5 +54,6 @@ router.use("/vfs", vfsRoutes);
 router.use("/visa-details", visaDetailsRoutes);
 router.use("/ksa-status", ksaStatusRoutes);
 router.use("/agency-payment", agencyPaymentRoutes);
+router.use("/otp", otpRoutes);
 
 export default router;

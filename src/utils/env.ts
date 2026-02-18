@@ -7,6 +7,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1),
   JWT_EXPIRES_IN: z.string().default("14d"),
   ALLOWED_ORIGINS: z.string().min(1),
+  GMAIL_USER: z.string().min(1),
+  GMAIL_APP_PASSWORD: z.string().min(1),
+  OTP_SECRET: z.string().min(1),
 });
 
 try {

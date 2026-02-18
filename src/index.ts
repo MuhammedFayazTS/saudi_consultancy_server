@@ -8,6 +8,7 @@ const port = env.PORT;
 const server = app.listen(port, () => {
   /* eslint-disable no-console */
   console.log(`Listening: http://localhost:${port}`);
+  console.log(`API Docs: http://localhost:${port}/api/docs`);
   /* eslint-enable no-console */
 });
 
