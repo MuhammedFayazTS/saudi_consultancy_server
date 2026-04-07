@@ -1,7 +1,8 @@
-import crypto from "crypto";
-import { createOtpRequestZod, verifyOtpRequestZod } from "../utils/validators/otp.zod";
+import crypto from "node:crypto";
+
 import { OtpSession } from "../models/otp-session.model";
-import { env } from "../utils/env";
+import { env } from "../utils/env.js";
+import { createOtpRequestZod, verifyOtpRequestZod } from "../utils/validators/otp.zod";
 
 const DEFAULT_TTL_SECONDS = 5 * 60; // 5 minutes
 

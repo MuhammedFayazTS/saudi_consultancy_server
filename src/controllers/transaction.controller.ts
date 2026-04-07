@@ -141,13 +141,9 @@ export const listForSelect = asyncHandler(async (req: Request, res: Response) =>
     .sort({ id: 1 });
 
   const options = transactions.map((transaction) => ({
-    label:
-      transaction.name +
-      " - " +
-      transaction.customerId?.name +
-      " (" +
-      transaction.customerId?.passportNumber +
-      ")",
+    label: `${transaction.name} - ${transaction.customerId?.name} (${
+      transaction.customerId?.passportNumber
+    })`,
     value: transaction._id,
   }));
 

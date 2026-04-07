@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { generateOTP, resendOTP, validateOTP } from "../controllers/otp.controller.js";
 import { authGuard } from "../middlewares/auth.middleware.js";
 

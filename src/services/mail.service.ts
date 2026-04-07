@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
-import { env } from "../utils/env";
+
+import { env } from "../utils/env.js";
 
 const GMAIL_USER = env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = env.GMAIL_APP_PASSWORD;
