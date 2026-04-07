@@ -4,11 +4,13 @@ import type MessageResponse from "../interfaces/message-response.js";
 
 import { authGuard } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
+import agencyPaymentRoutes from "./agency-payment.routes.js";
 import authRoutes from "./auth.routes";
 import customerRoutes from "./customer.routes";
 import ksaStatusRoutes from "./ksa-status.routes.js";
 import medicalPaymentRoutes from "./medical-payment.routes.js";
 import medicalStatusRoutes from "./medical-status.routes.js";
+import otpRoutes from "./otp.routes.js";
 import passportPossessionRoutes from "./passport-possession.routes.js";
 import ticketRoutes from "./ticket.routes";
 import tradeCertificateRoutes from "./trade-certificate.routes.js";
@@ -16,8 +18,6 @@ import transactionRoutes from "./transaction.routes.js";
 import userRoutes from "./user.routes";
 import vfsRoutes from "./vfs.routes.js";
 import visaDetailsRoutes from "./visa-details.routes.js";
-import agencyPaymentRoutes from "./agency-payment.routes.js";
-import otpRoutes from "./otp.routes.js";
 
 const router = express.Router();
 

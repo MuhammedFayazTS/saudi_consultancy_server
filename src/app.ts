@@ -7,9 +7,9 @@ import swaggerUi from "swagger-ui-express";
 import type MessageResponse from "./interfaces/message-response.js";
 
 import api from "./api/index.js";
+import { loadOpenApiSpec } from "./config/swagger.js";
 import * as middlewares from "./middlewares/middlewares.js";
 import { env } from "./utils/env.js";
-import { loadOpenApiSpec } from "./config/swagger.js";
 
 const app = express();
 

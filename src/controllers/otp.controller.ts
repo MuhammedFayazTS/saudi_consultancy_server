@@ -1,11 +1,12 @@
 import type { Request, Response } from "express";
+
 import asyncHandler from "express-async-handler";
 
 import { HTTPSTATUS } from "../constants/httpstatus.js";
-import { createOtpSession, verifyOtp } from "../services/otp.service.js";
-import { sendOtpEmail } from "../services/mail.service.js";
-import { OtpSession } from "../models/otp-session.model.js";
 import { OTP_RESEND_COOLDOWN_SECONDS } from "../constants/otp.js";
+import { OtpSession } from "../models/otp-session.model.js";
+import { sendOtpEmail } from "../services/mail.service.js";
+import { createOtpSession, verifyOtp } from "../services/otp.service.js";
 
 export const generateOTP = asyncHandler(async (req: Request, res: Response) => {
   const { email, purpose, module, ttlSeconds } = req.body;
