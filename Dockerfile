@@ -30,6 +30,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Install curl for health check
+RUN apk add --no-cache curl
+
 # Copy only production dependencies
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY package.json ./
@@ -37,5 +40,7 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/docs ./src/docs
 
 EXPOSE 3500
+
+HEALTHCHECK --interval=30s --retries=3 CMD curl -f http://localhost:3000/api/v1 || exit 1
 
 CMD ["node", "dist/index.js"]
