@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { objectIdSchema } from "../zod.helper";
+import { objectIdSchema } from "../zod.helper.js";
 
 export const visaDetailsZodSchema = z
   .object({
@@ -33,6 +33,10 @@ export const visaDetailsZodSchema = z
       .trim()
       .min(1, "Agency is required")
       .max(100, "Agency cannot exceed 100 characters"),
+
+    wakalaAgency: z.string().trim().optional(),
+
+    agencyCharge: z.number().optional(),
 
     remarks: z.string().trim().max(500, "Remarks cannot exceed 500 characters").optional(),
   })
