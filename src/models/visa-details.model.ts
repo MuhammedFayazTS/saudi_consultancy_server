@@ -10,6 +10,8 @@ export interface IVisaDetails extends Document {
   paymentMode: string;
   profession: string;
   agency: string;
+  wakalaAgency?: string;
+  agencyCharge?: number;
   remarks: string;
   isDeleted: boolean;
 }
@@ -23,6 +25,8 @@ const VisaDetailsSchema = new Schema<IVisaDetails>(
     paymentMode: { type: String, required: true, trim: true },
     profession: { type: String, required: true, trim: true },
     agency: { type: String, required: true, trim: true },
+    wakalaAgency: { type: String, trim: true },
+    agencyCharge: { type: Number, min: 0 },
     remarks: { type: String, trim: true },
     isDeleted: { type: Boolean, default: false, index: true },
   },
