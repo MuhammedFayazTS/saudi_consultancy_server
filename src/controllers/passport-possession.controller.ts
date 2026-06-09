@@ -24,7 +24,7 @@ export const createPassportPossession = asyncHandler(async (req: Request, res: R
 
   if (existingPossession) {
     res.status(HTTPSTATUS.BAD_REQUEST).json({
-      message: "transaction already has an active Passport Possession record.",
+      message: "transaction already has an active Passport Posission record.",
     });
     return;
   }
@@ -36,7 +36,7 @@ export const createPassportPossession = asyncHandler(async (req: Request, res: R
 
   res
     .status(HTTPSTATUS.CREATED)
-    .json({ message: "Passport Possession registered successfully", passportPossession });
+    .json({ message: "Passport Posission registered successfully", passportPossession });
 });
 
 export const updatePassportPossession = asyncHandler(async (req: Request, res: Response) => {
@@ -52,12 +52,12 @@ export const updatePassportPossession = asyncHandler(async (req: Request, res: R
   );
 
   if (!passportPossession) {
-    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
+    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Posission not found" });
     return;
   }
 
   res.status(HTTPSTATUS.OK).json({
-    message: "Passport Possession updated successfully",
+    message: "Passport Posission updated successfully",
     passportPossession,
   });
 });
@@ -160,7 +160,7 @@ export const getPassportPossessionById = asyncHandler(async (req: Request, res: 
     .lean();
 
   if (!passportPossession) {
-    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
+    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Posission not found" });
     return;
   }
 
@@ -170,7 +170,7 @@ export const getPassportPossessionById = asyncHandler(async (req: Request, res: 
   }
 
   res.status(HTTPSTATUS.OK).json({
-    message: "Passport Possession fetched successfully",
+    message: "Passport Posission fetched successfully",
     data: {
       ...passportPossession,
       transaction,
@@ -185,11 +185,11 @@ export const deletePassportPossession = asyncHandler(async (req: Request, res: R
   const passportPossession = await PassportPossession.findByIdAndDelete(id, softDelete);
 
   if (!passportPossession) {
-    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Possession not found" });
+    res.status(HTTPSTATUS.NOT_FOUND).json({ message: "Passport Posission not found" });
     return;
   }
 
   res.status(HTTPSTATUS.OK).json({
-    message: "Passport Possession deleted successfully",
+    message: "Passport Posission deleted successfully",
   });
 });
