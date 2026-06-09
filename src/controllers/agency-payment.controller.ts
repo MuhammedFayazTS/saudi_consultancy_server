@@ -66,7 +66,7 @@ export const listAgencyPayment = asyncHandler(async (req: Request, res: Response
 
   // field projection
   const { fields } = req.query;
-  let projection = "transactionId date agency amount remarks createdAt";
+  let projection = "transactionId date agency amount paymentMode remarks createdAt";
 
   if (fields) {
     const allowedFields = [
@@ -75,6 +75,7 @@ export const listAgencyPayment = asyncHandler(async (req: Request, res: Response
       "date",
       "agency",
       "amount",
+      "paymentMode",
       "remarks",
       "createdAt",
       "updatedAt",

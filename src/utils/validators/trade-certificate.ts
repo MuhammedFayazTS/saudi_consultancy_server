@@ -14,10 +14,10 @@ export const tradeCertificateZodSchema = z
     appointMentPayment: z.number().optional(),
     paymentMethod: z.string().optional(),
 
-    tcSettingAmount: z.number().optional(),
-    tcSettingAmountCenter: z.string().optional(),
-    tcSettingAgency: z.string().optional(),
-    tcSettingDate: z.coerce.date().optional(),
+    // tcSettingAmount: z.number().optional(),
+    // tcSettingAmountCenter: z.string().optional(),
+    // tcSettingAgency: z.string().optional(),
+    // tcSettingDate: z.coerce.date().optional(),
 
     tcAppointmentAmount: z.number().optional(),
     tcAppointmentAmountCenter: z.string().optional(),

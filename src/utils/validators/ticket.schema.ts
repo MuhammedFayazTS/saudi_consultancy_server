@@ -9,4 +9,6 @@ export const TicketZodSchema = z.object({
   travellingDate: z.coerce.date(),
   airlineCompany: z.string().trim(),
   paymentMode: z.string().trim(),
+  issuedAgency: z.string().trim(),
+  ticketFare: z.number().positive(),
 });
