@@ -11,10 +11,10 @@ export interface ITradeCertificate extends Document {
   center: string;
   tcStatus: string;
 
-  tcSettingAmount: number;
-  tcSettingAmountCenter: string;
-  tcSettingAgency: string;
-  tcSettingDate: Date;
+  // tcSettingAmount: number;
+  // tcSettingAmountCenter: string;
+  // tcSettingAgency: string;
+  // tcSettingDate: Date;
 
   tcAppointmentAmount: number;
   tcAppointmentAmountCenter: string;
@@ -35,10 +35,10 @@ const TradeCertificateSchema = new Schema<ITradeCertificate>(
     center: { type: String, required: true },
     tcStatus: { type: String, required: true },
 
-    tcSettingAmount: { type: Number },
-    tcSettingAmountCenter: { type: String },
-    tcSettingAgency: { type: String },
-    tcSettingDate: { type: Date },
+    // tcSettingAmount: { type: Number },
+    // tcSettingAmountCenter: { type: String },
+    // tcSettingAgency: { type: String },
+    // tcSettingDate: { type: Date },
 
     tcAppointmentAmount: { type: Number },
     tcAppointmentAmountCenter: { type: String },

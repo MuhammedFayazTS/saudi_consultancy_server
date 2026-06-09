@@ -11,6 +11,8 @@ export interface ITicket extends Document {
   travellingDate: Date;
   airlineCompany: string;
   paymentMode: string;
+  issuedAgency: string;
+  ticketFare: number;
   createdAt?: Date;
   isDeleted: boolean;
 }
@@ -23,6 +25,8 @@ const TicketSchema = new Schema<ITicket>(
     travellingDate: { type: Date, required: true },
     airlineCompany: { type: String, required: true },
     paymentMode: { type: String, required: true },
+    issuedAgency: { type: String, required: true },
+    ticketFare: { type: Number, required: true },
     isDeleted: { type: Boolean, default: false, index: true },
   },
   {
